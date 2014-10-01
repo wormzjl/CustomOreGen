@@ -36,7 +36,6 @@ public class ValidatorDistribution extends ValidatorNode
             throw new ParserException("Failed to create distribution using \'" + this._distributionFactory + "\'.", this.getNode(), var7);
         }
 
-        this.getParser().target.getOreDistributions().add(this.distribution);
         this.getNode().setUserData("value", this.distribution, (UserDataHandler)null);
         super.validateChildren();
         String inherits = this.validateNamedAttribute(String.class, "Inherits", null, true);
@@ -76,6 +75,7 @@ public class ValidatorDistribution extends ValidatorNode
             {
                 if (newName != null)
                 {
+                	this.getParser().target.registerDistribution(newName, this.distribution);
                     this.distribution.setDistributionSetting(nameKey, newName);
                 }
             }
@@ -171,7 +171,7 @@ public class ValidatorDistribution extends ValidatorNode
             }
 
             for (ValidatorBlockDescriptor settingName : validateNamedChildren(2, "OreBlock", new ValidatorBlockDescriptor.Factory())) {
-                replacesKey1.add(settingName.blocks, settingName.weight);	
+                replacesKey1.add(settingName.blocks, settingName.weight, settingName.nbt);	
             }
             
             if (!replacesKey1.getDescriptors().isEmpty())
@@ -199,13 +199,13 @@ public class ValidatorDistribution extends ValidatorNode
         {
             BlockDescriptor biomeKey1 = new BlockDescriptor();
             for (ValidatorBlockDescriptor settingName : validateNamedChildren(2, "Replaces", new ValidatorBlockDescriptor.Factory())) {
-            	biomeKey1.add(settingName.blocks, settingName.weight, false, false);
+            	biomeKey1.add(settingName.blocks, settingName.weight, false, false, null);
             }
             for (ValidatorBlockDescriptor settingName : validateNamedChildren(2, "ReplacesOre", new ValidatorBlockDescriptor.Factory())) {
-            	biomeKey1.add(settingName.blocks, settingName.weight, true, false);
+            	biomeKey1.add(settingName.blocks, settingName.weight, true, false, null);
             }
             for (ValidatorBlockDescriptor settingName : validateNamedChildren(2, "ReplacesRegexp", new ValidatorBlockDescriptor.Factory())) {
-            	biomeKey1.add(settingName.blocks, settingName.weight, false, true);
+            	biomeKey1.add(settingName.blocks, settingName.weight, false, true, null);
             }
             
             if (!biomeKey1.getDescriptors().isEmpty())

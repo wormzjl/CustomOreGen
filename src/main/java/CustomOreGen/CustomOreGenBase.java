@@ -72,7 +72,10 @@ public class CustomOreGenBase
             "ThermalExpansion.xml",
             "SimpleOres2.xml",
             "Galacticraft.xml",
-            "Chisel.xml"
+            "Chisel.xml",
+            "Mekanism.xml",
+            "Steamcraft.xml",
+            "Gregtech.xml"
         };
         for (String module : extraModules) {
         	unpackConfigFile("modules/" + module, new File(defaultModulesDir, module));

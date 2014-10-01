@@ -26,7 +26,8 @@
             <OptionChoice name='AbyssalGeodesDist' displayState='shown' displayGroup='groupRailcraft'>
                 <Description> Controls how Railcraft Abyssal Geodes is generated </Description>
                 <DisplayName>Abyssal Geodes Type</DisplayName>
-                <Default>:= if(blockExists("Railcraft:tile.railcraft.cube:6"),"strategicClouds","disabled")</Default>
+                <Default>:=
+                if(blockExists("Railcraft:tile.railcraft.ore") &amp; blockExists("Railcraft:tile.railcraft.cube"),"strategicClouds","disabled")</Default>
                 <Choice value='strategicClouds' displayValue='Clouds'>
                     <Description> 
                         Large Geodes of Abyssal Stone containing
@@ -151,40 +152,25 @@
     *   Below are the actual distributions for the overworld and mystcraft ages.
     *
     *************************************************************************************-->
-    <IfCondition condition=':= dimension.generator = "RandomLevelSource" | dimension.generator = "ATGLevelSource"'>
+    <IfCondition condition=':= ?COGActive'>
         
         <Substitute name='RailcraftSubstitute' block='minecraft:stone'>
             <Description> 
-                Replace Railcraft-generated Sulfur and Abyssal Stone with vanilla stone.   
+                Replace Railcraft-generated Sulfur, Saltpeter,
+                Dark Ores, and Abyssal Stone with vanilla stone.   
             </Description>
             <Comment>  
                 The global option deferredPopulationRange must be large enough to catch all ore clusters (>= 32).
             </Comment>
 	    <Replaces block='Railcraft:tile.railcraft.cube:6'/>
             <Replaces block='Railcraft:tile.railcraft.ore:0'/>
-        </Substitute>
-        <IfCondition condition=':= RCSaltpeterDist != "default"'>
-        <Substitute name='RailcraftSubstitute2' block='minecraft:sand'>
-            <Description> 
-                Replace Railcraft-generated Saltpeter with Sand.   
-            </Description>
-            <Comment>  
-                The global option deferredPopulationRange must be large enough to catch all ore clusters (>= 32).
-            </Comment>
-            <Replaces block='Railcraft:tile.railcraft.ore:1'/>
-        </Substitute>
-	</IfCondition>
-        <Substitute name='RailcraftSubstitute3' block='minecraft:stone'>
-            <Description> 
-                Replace Railcraft-generated Dark Diamond, Emerald, and Lapis with vanilla stone.
-            </Description>
-            <Comment>  
-                The global option deferredPopulationRange must be large enough to catch all ore clusters (>= 32).
-            </Comment>
-	    <Replaces block='Railcraft:tile.railcraft.ore:2'/>
+            <IfCondition condition=':= RCSaltpeterDist != "default"'>
+              <Replaces block='Railcraft:tile.railcraft.ore:1'/>
+            </IfCondition>
+            <Replaces block='Railcraft:tile.railcraft.ore:2'/>
 	    <Replaces block='Railcraft:tile.railcraft.ore:3'/>
 	    <Replaces block='Railcraft:tile.railcraft.ore:4'/>
-	</Substitute>
+        </Substitute>
 	
         <!--*******************   Abyssal Geodes   *********************-->            
         <ConfigSection>
@@ -224,9 +210,8 @@
 		<Setting name='OreRadiusMult' avg='1' range='0.1'/>
 		<Setting name='OreDensity' avg='1.0'/>
                 <Setting name='OreVolumeNoiseCutoff' avg='0'/>
-		<BiomeType name='water'/>
-                <Biome name='river' weight='-1'/>
-              
+		<BiomeType name='ocean'/>
+                
                 <Veins name='DarkDiamondVeins' block='Railcraft:tile.railcraft.ore:2'
                        inherits='PresetAbyssalVeins'>
                   <Description>  
@@ -316,7 +301,7 @@
                     <Setting name='Height' avg=':=64/64 * dimension.groundLevel' range=':=5/64 * dimension.groundLevel'/> 
 		    <Replaces block='minecraft:sand'/>
                     <Replaces block='minecraft:sandstone'/>
-		    <BiomeType name='Desert'/>
+		    <BiomeType name='Sandy'/>
                 </StandardGen>
             </IfCondition>   
             
@@ -343,7 +328,7 @@
 		<Setting name='OreRadiusMult' avg='1.0' range='0.1'/> 
 		<Replaces block='minecraft:sand'/>
                 <Replaces block='minecraft:sandstone'/>
-		<BiomeType name='Desert'/>
+		<BiomeType name='Sandy'/>
               </Veins>
             </IfCondition>     
             
@@ -363,7 +348,7 @@
                 <Setting name='OreVolumeNoiseCutoff' avg='0'/>   
 		<Replaces block='minecraft:sand'/>
                 <Replaces block='minecraft:sandstone'/>
-		<BiomeType name='Desert'/>
+		<BiomeType name='Sandy'/>
                 </Cloud>
 <!-- Spawns in at level 1, in bedrock, causes stack overflow in worldgen -->
 <!--
@@ -381,7 +366,7 @@
                   <Setting name='OreDensity' avg='1'/>
                   <Setting name='OreVolumeNoiseCutoff' avg='0'/>
                   <Replaces block='minecraft:bedrock'/>
-                  <BiomeType name='Desert'/>
+                  <BiomeType name='Sandy'/>
                 </Cloud>
 -->
             </IfCondition>  

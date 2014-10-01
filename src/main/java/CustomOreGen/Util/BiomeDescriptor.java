@@ -1,6 +1,5 @@
 package CustomOreGen.Util;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -124,41 +123,22 @@ public class BiomeDescriptor implements Copyable<BiomeDescriptor>
     {
         float totalWeight = 0.0F;
         
-        String id = Integer.toString(biome.biomeID);
         String name = biome.biomeName;
-        BiomeDictionary.Type[] types = BiomeDictionary.getTypesForBiome(biome);
         
         for (Descriptor desc : this._descriptors) {
-            int oldMatches = desc.matches;
             Matcher matcher;
-            
             if (!desc.climate.isCompatible(biome))
             	continue;
             
             if (desc.describesType) {
-            	for (BiomeDictionary.Type type : types) {	
-            		matcher = desc.getPattern().matcher(type.name());
-            	
-            		if (matcher.matches())
-            		{
-            			++desc.matches;
-            			totalWeight += desc.weight;
-            			break;
-            		}
+            	BiomeDictionary.Type type = BiomeDictionary.Type.getType(desc.description);
+            	if (BiomeDictionary.isBiomeOfType(biome, type))
+            	{
+            		++desc.matches;
+            		totalWeight += desc.weight;
             	}
             } else {
-            	if (desc.matches == oldMatches && id != null)
-            	{
-            		matcher = desc.getPattern().matcher(id);
-
-            		if (matcher.matches())
-            		{
-            			++desc.matches;
-            			totalWeight += desc.weight;
-            		}
-            	}
-
-            	if (desc.matches == oldMatches && name != null)
+            	if (name != null)
             	{
             		matcher = desc.getPattern().matcher(name);
 
@@ -368,8 +348,8 @@ public class BiomeDescriptor implements Copyable<BiomeDescriptor>
         }
         
         public Climate() {
-        	this.minTemperature = this.minRainfall = 0F;
-			this.maxTemperature = this.maxRainfall = 2.0F;
+        	this.minTemperature = this.minRainfall = Float.NEGATIVE_INFINITY;
+			this.maxTemperature = this.maxRainfall = Float.POSITIVE_INFINITY;
         }
         
         public boolean isCompatible(BiomeGenBase biome) {

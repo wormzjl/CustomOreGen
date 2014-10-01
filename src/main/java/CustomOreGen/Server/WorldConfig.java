@@ -48,12 +48,12 @@ public class WorldConfig
     public boolean debuggingMode;
     public boolean vanillaOreGen;
     public boolean custom;
-    private Collection<IOreDistribution> oreDistributions;
+    private Map<String,IOreDistribution> oreDistributions;
     private Map<String,ConfigOption> configOptions;
     private Map<String,String> loadedOptions;
     private Map<String,Integer> worldProperties;
     private Map cogSymbolData;
-	private Collection<BiomeDescriptor> biomeSets;
+	private Map<String,BiomeDescriptor> biomeSets;
 	private BlockDescriptor equivalentBlockDescriptor;
 
     public static WorldConfig createEmptyConfig()
@@ -88,12 +88,12 @@ public class WorldConfig
         this.deferredPopulationRange = 0;
         this.debuggingMode = false;
         this.vanillaOreGen = false;
-        this.oreDistributions = new LinkedList();
+        this.oreDistributions = new LinkedHashMap();
         this.configOptions = new CIStringMap(new LinkedHashMap());
         this.loadedOptions = new CIStringMap(new LinkedHashMap());
         this.worldProperties = new CIStringMap(new LinkedHashMap());
         this.cogSymbolData = new CIStringMap(new LinkedHashMap());
-        this.biomeSets = new LinkedList();
+        this.biomeSets = new CIStringMap<BiomeDescriptor>();
         String dimensionBasename;
 
         if (world != null)
@@ -361,7 +361,7 @@ public class WorldConfig
 
     public Collection<IOreDistribution> getOreDistributions()
     {
-        return this.oreDistributions;
+        return this.oreDistributions.values();
     }
 
     public Collection<IOreDistribution> getOreDistributions(String namePattern)
@@ -372,7 +372,7 @@ public class WorldConfig
         {
             Pattern pattern = Pattern.compile(namePattern, 2);
             Matcher matcher = pattern.matcher("");
-            for (IOreDistribution dist : this.oreDistributions) {
+            for (IOreDistribution dist : this.oreDistributions.values()) {
             	matcher.reset(dist.toString());
 
                 if (matcher.matches())
@@ -463,30 +463,10 @@ public class WorldConfig
 
         };
     }
-
-    public Collection<BiomeDescriptor> getBiomeSets() {
-    	return biomeSets;
-    }
     
-	public Collection<BiomeDescriptor> getBiomeSets(String namePattern) {
-        LinkedList<BiomeDescriptor> matches = new LinkedList();
-
-        if (namePattern != null)
-        {
-            Pattern pattern = Pattern.compile(namePattern, Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher("");
-            for (BiomeDescriptor desc : this.biomeSets) {
-            	matcher.reset(desc.getName());
-
-                if (matcher.matches())
-                {
-                    matches.add(desc);
-                }
-            }
-        }
-
-        return Collections.unmodifiableCollection(matches);
-	}
+	public BiomeDescriptor getBiomeSet(String namePattern) {
+        return this.biomeSets.get(namePattern);
+	}	
 
 	public BlockDescriptor getEquivalentBlockDescriptor() {
 		if (this.equivalentBlockDescriptor == null) {
@@ -497,14 +477,25 @@ public class WorldConfig
 
 	private BlockDescriptor makeEquivalentBlockDescriptor() {
 		double totalWeight = 0;
-		for (IOreDistribution dist : this.oreDistributions) {
+		for (IOreDistribution dist : this.oreDistributions.values()) {
 			totalWeight += dist.getOresPerChunk();
 		}
 		BlockDescriptor desc = new BlockDescriptor();
-		for (IOreDistribution dist : this.oreDistributions) {
+		for (IOreDistribution dist : this.oreDistributions.values()) {
 			BlockDescriptor oreBlock = (BlockDescriptor)dist.getDistributionSetting("OreBlock");
 			desc.add(oreBlock, (float)(dist.getOresPerChunk() / totalWeight));
 		}
 		return desc;
+	}
+
+	public void registerDistribution(String newName, IOreDistribution distribution) {
+		if (this.oreDistributions.containsKey(newName)) {
+			this.oreDistributions.remove(newName); // otherwise, order is not updated
+		}
+		this.oreDistributions.put(newName, distribution);
+	}
+
+	public void registerBiomeSet(BiomeDescriptor biomeSet) {
+		this.biomeSets.put(biomeSet.getName(), biomeSet);
 	}
 }
